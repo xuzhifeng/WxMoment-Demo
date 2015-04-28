@@ -1,0 +1,18 @@
+@import "lib-reset-mobile";
+@import "lib-mixins-mobile";
+@import "lib-base";
+@import "page-list";
+
+// 自定义
+
+.page-list__li{
+	&:first-child{
+		background-color: pink;
+	}
+	&:nth-child(2){
+		background-color: cyan;
+	}
+	&:last-child{
+		background-color: purple;
+	}
+}

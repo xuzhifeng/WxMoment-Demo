@@ -1,0 +1,12 @@
+{
+    "devDependencies": {
+        "gm": "*",
+        "grunt": "*",
+        "grunt-contrib-less": "*",
+        "grunt-contrib-watch": "*",
+        "grunt-contrib-clean": "*",
+        "grunt-contrib-uglify": "*",
+        "jit-grunt": "*",
+        "matchdep": "*"
+    }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>竖屏切换</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <script src="../js/zepto_modify.js"></script>
+	<link rel="stylesheet" href="../css/style-page-list.css"/>
+	<!--模块调用参考 style-page-list.less-->
+
+	<script>
+		pageCount=3; // 总共有几个页面要滑
+	</script>
+</head>
+<body>
+
+<!--容器-->
+<div class="container">
+
+    <!--滑动切换的页面-->
+    <!--content-list部分 translate3d(0,yyypx,0)-->
+    <ul class="page-list">
+
+        <!--每一个li为每个页面的容器，设置页面底色-->
+        <li class="page-list__li">
+
+            <!--页面主内容区，设置页面背景图cover，完全居中-->
+            <div class="page-list__page page-0">
+
+                <!--页面内元素，绝对定位-->
+                <div class="ele page-0__xxx"></div>
+                <div class="ele page-0__yyy"></div>
+            </div>
+        </li>
+
+        <li class="page-list__li">
+            <div class="page-list__page page-1">
+                <div class="ele page-1__xxx"></div>
+                <div class="ele page-1__yyy"></div>
+            </div>
+        </li>
+
+        <li class="page-list__li">
+            <div class="page-list__page page-2">
+                <div class="ele page-2__xxx"></div>
+                <div class="ele page-2__yyy"></div>
+            </div>
+        </li>
+    </ul>
+
+</div>
+<script>
+
+    // 切换屏幕
+
+    // 上一屏
+    function screenUp() {
+        pageNumber--;
+        var translateString, transitionString;
+        if (pageNumber < 0) {
+            pageNumber = 0;
+        }
+        pageDistance = screenHeight * pageNumber;
+        translateString = "translate3d(0, -" + pageDistance + "px, 0)";
+        transitionString = "all 0.5s ease-in";
+
+        verticalList.css({
+            "-webkit-transform": translateString,
+            "transform": translateString,
+            "-webkit-transition": transitionString,
+            "transition": transitionString
+        });
+
+	    // 触发翻页自定义事件，在业务逻辑做上报(游戏侧)
+	    $.publish('pageTurn', {step: pageNumber});
+    }
+
+    // 下一屏
+    function screenDown() {
+        pageNumber++;
+        var translateString, transitionString;
+        if (pageNumber > (pageCount-1)) {
+            pageNumber = pageCount-1;
+        }
+        pageDistance = screenHeight * pageNumber;
+        translateString = "translate3d(0, -" + pageDistance + "px, 0)";
+        transitionString = "all 0.5s ease-in";
+
+        verticalList.css({
+            "-webkit-transform": translateString,
+            "transform": translateString,
+            "-webkit-transition": transitionString,
+            "transition": transitionString
+        });
+
+	    // 触发翻页自定义事件，在业务逻辑做上报(游戏侧)
+	    $.publish('pageTurn', {step: pageNumber});
+
+    }
+
+    // 定义变量
+    var screenHeight = document.documentElement.clientHeight,
+        screenWidth = document.documentElement.clientWidth,
+        verticalList = $(".page-list"),
+        pageNumber = 0,
+        pageDistance = 0;
+
+    verticalList.css({"height":screenHeight*pageCount+10,"width":screenWidth});
+    $(".page-list__li").css({"height":screenHeight,"width":screenWidth});
+
+    $(".container").on("touchmove",function(e){
+        e.preventDefault();
+    });
+
+    // 绑定事件
+    verticalList.on("swipeUp",screenDown);
+    verticalList.on("swipeDown",screenUp);
+</script>
+</body>
+</html>

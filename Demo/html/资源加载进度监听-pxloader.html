@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>微信游戏中心</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <script src="../js/zepto_modify.js"></script>
+    <script src="../js/pxloader-all.min.js"></script>
+    <script>
+        // 路径前缀,依据项目不同变化
+        var basePath = "http://3glogo.gtimg.com/tmt/_events/20150126-game-big-data/dist/";
+    </script>
+    <script>
+        function webpsupport(b) {
+            var e = window.localStorage;
+            if (e != undefined && e._tmtwebp != undefined && e._tmtwebp == 0) {
+                b()
+            } else {
+                if (e != undefined && e._tmtwebp != undefined && e._tmtwebp == 1) {
+                    b(1)
+                } else {
+                    var d = new Image();
+                    d.onload = d.onerror = function () {
+                        if (d.height != 2) {
+                            if (e != undefined) {
+                                e._tmtwebp = 0
+                            }
+                            b()
+                        } else {
+                            if (e != undefined) {
+                                e._tmtwebp = 1
+                            }
+                            b(1)
+                        }
+                    };
+                    d.src = "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA"
+                }
+            }
+        }
+        ;
+        (function () {
+            function b(t) {
+                var f = document.getElementsByTagName("link");
+                for (var e = 0, d = f.length; e < d; e++) {
+                    if (t) {
+                        f[e].href = f[e].getAttribute("data-href___").replace(".css", ".webp.css")
+                    } else {
+                        f[e].href = f[e].getAttribute("data-href___")
+                    }
+                }
+            }
+
+            webpsupport(b);
+        })();
+    </script>
+    <style>
+        html, body, .container {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .loading-wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 9;
+            background-color: #23C474;
+        }
+
+        .loading__word {
+            position: absolute;
+            left: 0;
+            font-size: 12px;
+            color: #ffffff;
+            width: 100%;
+            height: 20px;
+            line-height: 20px;
+            top: 220px;
+            text-align: center;
+        }
+
+        .loading__outer {
+            position: absolute;
+            top: 240px;
+            left: 50%;
+            margin-left: -63px;
+            width: 125px;
+            height: 15px;
+            background-color: #233C36;
+            border-radius: 15px;
+            border: 2px solid #43E092;
+        }
+
+        .loading__inner-wrap {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 121px;
+            height: 11px;
+            border-radius: 11px;
+            overflow: hidden;
+        }
+
+        .loading__inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 11px;
+            height: 11px;
+            border-radius: 11px;
+            background-color: #FFE900;
+        }
+    </style>
+</head>
+<body>
+
+<!--容器-->
+<div class="container">
+    <!--loading部分-->
+    <div class="loading-wrap">
+        <div class="loading__word">Loading...(<span class="loading__percent"></span>)</div>
+        <div class="loading__outer">
+            <div class="loading__inner-wrap">
+                <div class="loading__inner"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    /**
+     * Created by littledu on 2015/4/15.
+     */
+    $(document).ready(function () {
+
+
+        webpsupport(function (x) {
+            var loader = new PxLoader(),
+                fileList = [
+                    'img/a_man.png',
+                    'img/b1_bg_1.png',
+                    'img/b1_man_left.png',
+                    'img/b1_man_right.png',
+                    'img/b2_bg_gift_left.png',
+                    'img/b2_bg_gift_right.png',
+                    'img/b2_bg_shadow.png',
+                    'img/b2_wmn_body.png',
+                    'img/b2_wmn_clothe.png',
+                    'img/b2_wmn_gift.png',
+                    'img/b2_wmn_head_laugh.png'
+                ];
+
+            for (var i = 0; i < fileList.length; i++) {
+                var path = x ? fileList[i].replace(/\.\w+/, '.webp') : fileList[i];
+                var pxImage = new PxLoaderImage(basePath + path);
+
+                pxImage.imageNumber = i + 1;
+                loader.add(pxImage);
+            }
+
+            loader.addCompletionListener(function () {
+                $(".loading-wrap").css("display", "none");
+
+                // 主页面开始
+                showMain();
+            });
+
+            //loading 进度监听
+            loader.addProgressListener(function (e) {
+                var percentUp = Math.round((e.completedCount / e.totalCount) * 100), //正序, 1-100
+                    progressDown = 100 - percentUp;                                   //倒序, 100-1
+
+                $(".loading__percent").html(percentUp + "%");
+                $(".loading__inner").css("width", 11 + 110 / 100 * percentUp);
+            });
+
+            //启动
+            loader.start();
+        });
+    });
+</script>
+</body>
+</html>

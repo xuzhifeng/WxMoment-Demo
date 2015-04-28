@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>资源分步加载</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <script src="../js/zepto_modify.js"></script>
+    <script src="../js/head.min.js"></script>
+</head>
+<body>
+
+<script>
+    $(document).ready(function () {
+
+        // loading时加载的资源
+        head.load("../js/index.js", "../../dev/css/global.css", "../../dev/css/page-0.css", function () {
+
+            // 设定作为资源加载完毕的基准图片
+            var imgPre = preImg(".swipe-up");
+
+            // 图片(初步资源)加载完毕后
+            imgPre.onload = function () {
+
+                // 判断加载完成后执行的代码
+                // 去除loading,显示主页面等等
+
+                // 显示页面后默默继续加载的资源
+                head.load("../../dev/css/page-1.css", "../../dev/css/page-2.css");
+            };
+        });
+
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>预约浮层</title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="format-detection" content="telephone=no">
+	<script src="../js/zepto_modify.js"></script>
+	<script src="http://labs.api.act.qq.com/js/apicall.js"></script>
+	<link rel="stylesheet" href="../css/style-reservation.css"/>
+	<!--模块调用参考 style-reservation.less-->
+	<script>
+		// 必须加上
+		// document.domain = "qq.com";
+	</script>
+</head>
+<body>
+
+<!--容器-->
+<div class="container">
+
+	<div class="reservation__mask"></div>
+
+	<div class="reservation__box">
+
+		<i class="reservation__logo"></i>
+		<div class="reservation__close"></div>
+		<div class="reservation__form">
+			<label class="reservation__input-label reservation__input-label_name">
+				<input type="text" class="reservation__input" id="js-name"/>
+				<span class="reservation__input-title">姓名</span>
+			</label>
+			<div class="reservation__radio-wrap">
+				<label class="reservation__radio-label">
+					<input type="radio" name="sex" class="reservation__radio reservation__radio_m" value="m"/>
+					<span class="reservation__radio-title">先生</span>
+				</label>
+				<label class="reservation__radio-label">
+					<input type="radio" name="sex" class="reservation__radio reservation__radio_f" value="f"/>
+					<span class="reservation__radio-title">女士</span>
+				</label>
+			</div>
+			<label class="reservation__input-label reservation__input-label_phone">
+				<input type="tel" class="reservation__input" id="js-tel"/>
+				<span class="reservation__input-title">手机</span>
+			</label>
+			<label class="reservation__check-label">
+				<input type="checkbox" name="agree" class="reservation__check"/>
+				<span class="reservation__check-title">我愿意将以上信息提交给东风英菲尼迪联系试驾事宜</span>
+			</label>
+		</div>
+
+		<!--结果页面，默认隐藏-->
+		<div class="reservation__result">
+			你的试驾预约已成功！
+		</div>
+
+		<div class="reservation__btn-submit">提交试驾</div>
+
+	</div>
+
+	<!-- tmp -->
+	<div class="tmp-btn" style="color: #ffffff;text-align: center;background-color: gray;">显示预约浮层</div>
+</div>
+<script>
+	//setTamsId内包裹的为活动ID
+	ApiCall.setTamsId(641011142);
+	function actCall(type, toUrl, data, callBack) {
+		ApiCall.libCall({
+			type: type,
+			url: toUrl,
+			data: data,
+			dataType: 'json',
+			error: function () {
+				alert('ajax call error');
+				return false;
+			},
+			success: function (r) {
+				if (typeof(callBack) != "undefined" && typeof(eval(callBack)) == "function") {
+					callBack(r);
+				}
+			}
+		});
+	}
+
+	/*
+	 * 保存试乘试驾信息接口(不用QQ登录)
+	 * @param param json
+	 * @param callback function
+	 * @return JSON
+	 */
+	function api_testdrive_save_info(param, callback) {
+		actCall("POST", "testdrive/save_infonologin", param, callback);
+	}
+
+	// 点击提交按钮的相关逻辑,未提交信息的,点击后显示结果和确认按钮,点击确认按钮关闭浮层
+	// 同一页面未刷新情况下,再次打开时默认只出现结果页面
+	function submitHandler(){
+
+		if(!submitted){
+			var test = /^1[3|4|5|7|8][0-9]\d{8}$/;
+			var nameVal = $("#js-name").val();
+			var mobileVal = $("#js-tel").val();
+			var sexVal = $('.reservation__radio[name="sex"]:checked').val();
+
+			var param = {
+				"name": nameVal,
+				"mobile": mobileVal,
+				"sex": sexVal
+			};
+
+			if (document.querySelector(".reservation__check").checked==false) {
+				alert("请同意将以上信息提交给东风英菲尼迪");
+			} else if (nameVal == '') {
+				alert("姓名不能为空 ");
+			} else if (!test.test(mobileVal)) {
+				alert("手机号码格式不正确");
+			} else {
+				api_testdrive_save_info(param, function (resp) {
+					if (resp.message == "success") {
+						$(".reservation__result").css("display","block");
+						$(".reservation__form").css("display","none");
+						$(".reservation__btn-submit").html("确定");
+						submitted=1;
+					} else {
+						alert(resp.message);
+					}
+				});
+			}
+		}else{
+			hideReservation();
+		}
+	}
+
+	// 隐藏预约浮层
+	function hideReservation(){
+		$(".reservation__mask").css("display","none");
+		$(".reservation__box").css("display","none");
+	}
+
+	// 显示预约浮层
+	function showReservation(){
+		$(".reservation__mask").css("display","block");
+		$(".reservation__box").css("display","block");
+		document.querySelector(".reservation__check").checked=true;
+		document.querySelector(".reservation__radio_m").checked=true;
+	}
+
+
+	var submitted=0;
+	$(".tmp-btn").on("click",showReservation);
+	$(".reservation__close").on("tap",hideReservation);
+	$(".reservation__btn-submit").on("tap",submitHandler);
+</script>
+</body>
+</html>

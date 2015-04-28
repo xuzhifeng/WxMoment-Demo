@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>微信分享</title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="format-detection" content="telephone=no">
+	<script>
+		// 路径前缀,依据项目不同变化
+		var basePath="http://wximg.gtimg.com/tmt/_events/20150317-promo-head-shoulders/dist/";
+	</script>
+</head>
+<body>
+
+
+
+<script>
+
+	// 分享内容变量,可根据情况,动态修改,这里为默认状态
+
+	// 链接缩略图 图片建议尺寸 120x120
+	var wxshareImg = basePath + 'img/thumb.jpg';
+
+	// 分享出去的链接
+	var wxshareUrl = window.location.href.split("?")[0].replace(/([&|\?]{1})ticket=[\w\-]+(&?)/, '$1').replace(/\?$/, '');
+
+	// 分享给朋友的标题
+	var shareFriendTitle="说出你的不屑态度";
+
+	// 分享给朋友的文案
+	var shareFriendDes="多数人在意的，可能是实力派不屑的";
+
+	// 分享到朋友圈的文案
+	var momentTitle="做个实力派，敢于不屑的态度";
+
+	function getWxShareData() {
+		return {
+			'img_url': wxshareImg,
+			'title': shareFriendTitle,
+			'desc': shareFriendDes,
+			'link': wxshareUrl
+		};
+	}
+
+	function getWxShareMomentData() {
+		return {
+			'img_url': wxshareImg,
+			'title': momentTitle,
+			'desc': "",
+			'link': wxshareUrl
+		};
+	}
+
+	var bindit = function () {
+		// 发送给好友;
+		WeixinJSBridge.on('menu:share:appmessage', function () {
+			WeixinJSBridge.invoke('sendAppMessage', getWxShareData(), function (r) {
+				if(r.err_msg!=="send_app_msg:cancel"){
+
+					// 成功发送给好友后
+					// 定义页面反馈
+				}
+			});
+		});
+		// 分享到朋友圈;
+		WeixinJSBridge.on('menu:share:timeline', function () {
+			WeixinJSBridge.invoke('shareTimeline', getWxShareMomentData(), function (r) {
+				if(r.err_msg!=="share_timeline:cancel"){
+
+					// 成功分享到朋友圈后
+					// 定义页面反馈
+				}
+			});
+		});
+		// 分享到微博;
+		WeixinJSBridge.on('menu:share:weibo', function () {
+
+			WeixinJSBridge.invoke('shareWeibo', getWxShareMomentData(), function (r) {
+			});
+		});
+		// 分享到Facebook
+		WeixinJSBridge.on('menu:share:facebook', getWxShareData(), function (r) {
+		});
+	};
+
+	document.addEventListener('WeixinJSBridgeReady', bindit, false);
+</script>
+</body>
+</html>

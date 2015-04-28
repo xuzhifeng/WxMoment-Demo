@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>音乐播放</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <script src="../js/zepto_modify.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+            -webkit-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-overflow-scrolling: touch;
+            -webkit-tap-highlight-color:rgba(0, 0, 0, 0);
+            -webkit-backface-visibility:hidden;
+            -webkit-perspective:1000;
+			background:hotpink;
+        }
+        .speaker-wrap{
+            width: 50px;
+            height: 50px;
+            top: 0;
+            right: 0;
+            z-index: 4;
+        }
+        .speaker{
+            background-image: url("../img/speaker.png");
+	        background-position: center;
+	        background-size: 26px;
+            width: 26px;
+            height: 26px;
+            z-index: 8;
+            right: 10px;
+            top: 10px;
+        }
+        .speaker_muted{
+            background-image: url("../img/speaker_muted.png");
+	        background-position: center;
+	        background-size: 26px;
+        }
+        .ele{
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+<!--声音的开放和静默-->
+<div class="ele speaker-wrap">
+    <div class="ele speaker"></div>
+</div>
+
+<!--背景音乐-->
+<audio id="audio" src="../media/bgm.mp3" autoplay="autoplay" loop="loop"></audio>
+
+
+<script>
+
+    function toggleMusic(){
+        if (audioEle.paused) {
+            speakerIcon.removeClass("speaker_muted");
+            audioEle.play();
+        } else {
+            speakerIcon.addClass("speaker_muted");
+            audioEle.pause();
+        }
+    }
+
+    function startPlayMusic(){
+        if(firstTaped===0){
+            audioEle.play();
+            firstTaped=1;
+        }
+    }
+
+    var firstTaped= 0,
+        audioEle=document.getElementById("audio"),
+        speakerEle=$(".speaker-wrap"),
+        speakerIcon=$(".speaker");
+
+    $("html").on("touchstart",startPlayMusic);
+
+    // 控制音乐播放或暂停
+    speakerEle.on("tap",toggleMusic);
+
+</script>
+</body>
+</html>

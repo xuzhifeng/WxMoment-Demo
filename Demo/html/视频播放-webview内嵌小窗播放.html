@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>视频播放-webview内嵌</title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui" />
+	<meta name="format-detection" content="telephone=no">
+	<!--基础样式-->
+	<link rel="stylesheet" href="../css/style-main.css"/>
+
+	<style>
+
+		/*腾讯视频模块样式重写*/
+
+		.tvp_controls{display: none!important;}
+		.tvp_overlay_play,.tvp_button_play{
+			background: none!important;
+			border: none!important;
+		}
+		.tvp_containers,video{
+			background-image: url("http://wximg.gtimg.com/tmt/_events/20150311-promo-infiniti/dist/img/video_ph.jpg")!important;
+			background-position:center center!important;
+			background-size:cover!important;
+		}
+		.tvp_shadow{
+			background-image: url("http://wximg.gtimg.com/tmt/_events/20150311-promo-infiniti/dist/img/video_ph.jpg")!important;
+			background-position:center!important;
+			background-size:cover!important;
+		}
+		.mod_player_off .tvp_containers,.mod_player_off video{
+			background:none!important;
+		}
+
+		/*自定义样式*/
+		.video-wrap{
+			position: absolute;
+			top: 153px;
+			left: 50%;
+		}
+		.video-box{
+			margin-bottom: 15px;
+		}
+		.video-control{
+			background-image: url("http://wximg.gtimg.com/tmt/_events/20150311-promo-infiniti/dist/img/control_pause.png");
+			background-position: center;
+			background-size: 28px;
+			width: 28px;
+			height: 28px;
+			margin:0 auto;
+			opacity: 0;
+		}
+
+		.video-control_play{
+			background-image: url("http://wximg.gtimg.com/tmt/_events/20150311-promo-infiniti/dist/img/control_play.png");
+		}
+
+
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="video-wrap">
+		<div class="video-box" id="mod_player"></div>
+		<div class="video-control" id="controlBtn"></div>
+	</div>
+</div>
+
+<script src="../js/zepto_modify.js"></script>
+
+<script src="http://imgcache.gtimg.cn/tencentvideo_v1/tvp/js/tvp.player_v2_zepto.js"></script>
+<!--注：播放器代码请使用上述线上地址，保持与腾讯视频官方的版本同步-->
+<!--Zepto 插件版本(内核异步按需加载) zepto合并时必须模块:detect,touch-->
+
+<!--<script src="http://imgcache.gtimg.cn/tencentvideo_v1/tvp/js/tvp.player_v2_jq.js"></script>-->
+<!--jQuery 插件版本(内核异步按需加载)，仅支持jQuery1.7以上版本-->
+
+<script>
+
+	function initVideo() {
+		videoWidth = screenWidth - 20;
+		videoHeight = videoWidth * (1080 / 1920);
+		video = new tvp.VideoInfo();
+		index = 0;
+		flag = 0;
+
+		$(".video-box").css({"width": videoWidth, "height": videoHeight});
+		$(".video-wrap").css("margin-left", -videoWidth / 2);
+
+		//	设定视频id
+		video.setVid('k0148sw4wg5');
+
+		player = new tvp.Player();
+		player.create({
+			width: '100%',
+			height: '100%',
+			video: video,
+			modId: "mod_player",
+			isHtml5ControlAlwaysShow: false,
+			isHtml5UseUI: true,
+			html5LiveUIFeature: false,
+			isHtml5UseFakeFullScreen: true,
+			isiPhoneShowPlaysinline: true,
+			vodFlashExtVars: {
+				share: 0, follow: 0, showlogo: 0, clientbar: 0
+			},
+			plugins: {
+				AppBanner: 0,
+				AppRecommend: 0
+			},
+			autoplay: false,
+			onplay: function () {
+				// 开始加载视频资源准备播放
+			},
+			onplaying: function () {
+				// 开始播放视频第一帧
+
+				// 去掉视频缩略图
+				$('#mod_player').addClass('mod_player_off');
+				$(".tvp_shadow").css("display", "none");
+				flag = 1;
+				$(".video-control").css("opacity", "1");
+			},
+			onpause: function () {
+				// 当输出播放器时
+				flag = 0;
+			},
+			onallended: function () {
+				//播放到最后完毕
+				doSomething();
+			},
+			onfullscreen: function (a) {
+				// alert(parseInt(player.getPlayer().currentTime) + 'xx' + parseInt(player.getPlayer().duration))
+				// 用户点击 done 退出全屏的时候 a 为 false
+				// 切当前已播放时长等于视频总时长才触发
+				$(".video-control").css("opacity", "0");
+				var currentTime = parseInt(player.getPlayer().currentTime);
+				var fulltTime = parseInt(player.getPlayer().duration);
+
+				// 若没放完成，则会返回时长是 0
+				if (!a && currentTime && fulltTime && currentTime == fulltTime) {
+					// 执行后面的动画 -> 设备动画小于 iPhone 5c
+					// 注意这种情况下,包括最上方的 onallended , doSomething(),执行了两遍, 有些事件需要先解绑在绑定
+					doSomething();
+				}
+			}
+		});
+
+		$('#controlBtn').on("touchstart", function () {
+			if(flag == 0){
+				player.getPlayer().play();
+				$(".video-control").removeClass("video-control_play");
+			}
+			else{
+				player.getPlayer().pause();
+				$(".video-control").addClass("video-control_play");
+			}
+		});
+	}
+
+
+	var  screenHeight = document.documentElement.clientHeight,
+		 screenWidth = document.documentElement.clientWidth,
+		 video,
+		 videoWidth,
+		 videoHeight,
+		 index,
+		 flag,
+		 player;
+
+	$(document).ready(initVideo());
+</script>
+</body>
+</html>

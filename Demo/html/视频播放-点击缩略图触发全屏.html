@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>点击触发全屏</title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui" />
+	<meta name="format-detection" content="telephone=no">
+	<script>
+		var bathPath="./";
+	</script>
+	<style>
+
+		/*腾讯视频自定义模块样式重写*/
+
+		.tvp_container{
+			background:transparent!important;
+		}
+		#mod_tenvideo_video_player_0{
+			background:transparent!important;
+		}
+		#mod_tenvideo_video_player_1{
+			background:transparent!important;
+		}
+		#mod_tenvideo_video_player_2{
+			background:transparent!important;
+		}
+
+		.tvp_overlay_play{
+			width: 100%!important;
+			height: 100%!important;
+			bottom:0!important;
+			background:transparent!important;
+		}
+		.tvp_button_play{
+			opacity: 0!important;
+		}
+		.tvp_video{
+			opacity: 0!important;
+		}
+		.tvp_controls{
+			opacity: 0!important;
+		}
+		.tvp_overlay_loading{
+			background-color: rgba(0, 0, 0, .6)!important;
+			border-radius: 30px!important;
+			margin:-20px 0 0 -20px!important;
+			top: 50%!important;
+			left: 50%!important;
+			right: auto!important;
+			bottom: auto!important;
+		}
+
+
+		/*自定义样式*/
+		/*video-box 作为视频容器,样式必须如下*/
+	    .video-box{
+		    position: absolute;
+		    z-index: 999;
+		    width: 100%;
+		    height: 100%;
+		    top: 0;
+		    left: 0;
+		    display: none;
+	    }
+		.video-ph-wrap{
+			margin: 0 38px 34px;
+		}
+		.video-ph{
+			display: block;
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+
+<!--容器-->
+<div class="container">
+
+	<!-- 占位图片,一般点击该图片即触发全屏播放 -->
+	<div class="video-ph-wrap">
+		<!-- src 为展位图片路径 -->
+		<img src="http://wximg.gtimg.com/tmt/_events/20150408-promo-fast-furious7/dist/img/video_ph.jpg" alt="" class="video-ph"/>
+	</div>
+</div>
+
+<!--视频容器,保持在页面最外层, 使用时结构和 class 直接复用-->
+<div class="video-box" id="mod_player"></div>
+
+<script src="../js/zepto_modify.js"></script>
+<script src="http://imgcache.gtimg.cn/tencentvideo_v1/tvp/js/tvp.player_v2_zepto.js"></script>
+<!--注：播放器代码请使用上述线上地址，保持与腾讯视频官方的版本同步-->
+<!--Zepto 插件版本(内核异步按需加载) zepto合并时必须模块:detect,touch-->
+
+<!--<script src="http://imgcache.gtimg.cn/tencentvideo_v1/tvp/js/tvp.player_v2_jq.js"></script>-->
+<!--jQuery 插件版本(内核异步按需加载)，仅支持jQuery1.7以上版本-->
+
+<script>
+	function initWrite() {
+		var v = tvp.$('#mod_player video');
+		tvp.$(v).off('play').on('play', function () {
+			videoBox.css({
+				"position":"absolute",
+				"top":"0",
+				"left":"0",
+				"width": document.documentElement.clientWidth,
+				"height": document.documentElement.clientHeight
+			}).show();
+			if (navigator.userAgent.indexOf('OS 8_') != -1) {
+				player.enterFullScreen();
+			}
+
+		});
+	}
+
+	function initVideo(){
+
+		var vid='a01472189tt';
+
+
+		video = new tvp.VideoInfo();
+		index = 0;
+
+		//	设置视频id
+		video.setVid(vid);
+
+		player = new tvp.Player();
+		player.create({
+			width: '100%',
+			height: '100%',
+			video: video,
+			modId: "mod_player",
+			isHtml5UseFakeFullScreen: false,
+			isHtml5ShowLoadingAdOnStart: false,
+			isHtml5ShowLoadingAdOnChange: false,
+			vodFlashExtVars: {
+				share: 0, follow: 0, showlogo: 0, clientbar: 0
+			},
+			plugins: {
+				AppBanner:0,
+				AppRecommend: 0
+			},
+			autoplay:false,
+			onwrite: function () {
+
+				// 部分安卓默认执行 onwrite, 默认全屏,所以只在苹果执行这一步
+
+				var sUserAgent = navigator.userAgent.toLowerCase();
+				var bIsAndroid = sUserAgent.match(/android/i) == "android";
+
+				if(!bIsAndroid){
+					initWrite();
+				}
+			},
+			onplay: function(){
+				// 开始加载视频资源准备播放
+				if (navigator.userAgent.indexOf('OS 8_') != -1) {
+					player.enterFullScreen();
+				}
+			},
+			onplaying: function(){
+
+				player.enterFullScreen();
+
+				// 开始播放视频第一帧
+
+				// 去掉视频缩略图
+				$('#mod_player').addClass('mod_player_off');
+			},
+			onfullscreen: function(a){
+				!a && videoBox.hide();
+			}
+		});
+
+		// 绑定事件
+		$(".video-ph-wrap").on("tap",function(){
+			// iOS 拉起原生，Android 跳转到播放器
+			if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+				var v = player.curVideo;
+
+				//	设置视频id
+				v.setVid(vid);
+
+				player.play(v);
+				player.play();
+			} else {
+				// 额外的播放器, 这里要拷贝 player.html 到项目中, 并引用绝对路径
+                // 此处有一个优化点：Android 从全屏播放返回后应该记住之前的页数，直接跳转到对应页面
+				window.location.href =  bathPath+"player.html?vid="+vid;
+			}
+		});
+	}
+
+	var video,
+		index,
+		player,
+		videoBox = $('#mod_player');
+
+
+	$(document).ready(initVideo());
+</script>
+</body>
+</html>

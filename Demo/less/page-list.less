@@ -1,0 +1,31 @@
+.page-list{
+	position: absolute;
+	width: 100%;
+	top:0;
+	left: 0;
+	list-style: none;
+	-webkit-transform-origin: center;
+	transform-origin: center;
+}
+.page-list__li{
+	list-style: none;
+	position: relative;
+    .background-size(cover);
+    background-position: center;
+}
+.page-list__page{
+	position: absolute;
+	width: 320px;
+	height: 504px;
+	top: 50%;
+	left: 50%;
+	margin: -252px 0 0 -160px;
+	-webkit-perspective:1000;
+	perspective:1000;
+}
+.page-list_horizontal{
+	font-size: 0;
+	.page-list__li{
+		display: inline-block;
+	}
+}

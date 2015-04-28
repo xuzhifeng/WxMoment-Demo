@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>微信游戏中心</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <script src="../js/zepto_modify.js"></script>
+    <script src="../js/preloadjs-0.6.0.min.js"></script>
+	<script>
+		// 路径前缀,依据项目不同变化
+		var basePath="http://3glogo.gtimg.com/tmt/_events/20150126-game-big-data/dist/";
+	</script>
+    <style>
+        html,body,.container{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .loading-wrap{
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 9;
+            background-color: #23C474;
+        }
+        .loading__word{
+            position: absolute;
+            left: 0;
+            font-size: 12px;
+            color: #ffffff;
+            width: 100%;
+            height: 20px;
+            line-height: 20px;
+            top: 220px;
+            text-align: center;
+        }
+        .loading__outer{
+            position: absolute;
+            top: 240px;
+            left: 50%;
+            margin-left: -63px;
+            width: 125px;
+            height: 15px;
+            background-color: #233C36;
+            border-radius: 15px;
+            border: 2px solid #43E092;
+        }
+        .loading__inner-wrap{
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 121px;
+            height: 11px;
+            border-radius: 11px;
+            overflow: hidden;
+        }
+        .loading__inner{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 11px;
+            height: 11px;
+            border-radius: 11px;
+            background-color: #FFE900;
+        }
+    </style>
+</head>
+<body>
+
+<!--容器-->
+<div class="container">
+    <!--loading部分-->
+    <div class="loading-wrap">
+        <div class="loading__word">Loading...(<span class="loading__percent"></span>)</div>
+        <div class="loading__outer">
+            <div class="loading__inner-wrap">
+                <div class="loading__inner"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    /**
+     * Created by fierayan on 2015/1/30.
+     */
+    $(document).ready(function(){
+        var preloadDone=0;
+        var manifestList=[
+            {
+                fileList:[
+                    {src:"js/index.js",type:createjs.AbstractLoader.JAVASCRIPT},
+                    {src:"img/a_man.png"},
+                    {src:"img/b1_bg_1.png"},
+                    {src:"img/b1_man_left.png"},
+                    {src:"img/b1_man_right.png"},
+                    {src:"img/b2_bg_gift_left.png"},
+                    {src:"img/b2_bg_gift_right.png"},
+                    {src:"img/b2_bg_shadow.png"},
+                    {src:"img/b2_wmn_body.png"},
+                    {src:"img/b2_wmn_clothe.png"},
+                    {src:"img/b2_wmn_gift.png"},
+                    {src:"img/b2_wmn_head_laugh.png"}
+                ],
+                callback:function(){
+                    preloadDone=1;
+                }
+            }
+        ];
+
+        var queueList = [];
+
+        function loadQueue(j) {
+            if (j < queueList.length) {
+                queueList[j].loadManifest(manifestList[j]['fileList']);
+            }
+        }
+
+        //本次队列加载完成
+        function handleQueueComplete() {
+            //console.log(getNowFormatDate(), '队列加载完成，队列ID', currentQueueId);
+            if (manifestList[currentQueueId]["callback"]) {
+                manifestList[currentQueueId]["callback"]();
+            }
+
+            currentQueueId++;
+            loadQueue(currentQueueId);
+        }
+
+        function handleError(){
+            //alert('error'+currentQueueId);
+            //console.log(getNowFormatDate(), '队列加载失败，队列ID', currentQueueId);
+            if (manifestList[currentQueueId]["callback"]) {
+                manifestList[currentQueueId]["callback"]();
+            }
+
+            currentQueueId++;
+            loadQueue(currentQueueId);
+        }
+
+        function handleFileError(){
+            //alert('fileerror'+currentQueueId);
+        }
+
+        function handleFileLoad(event) {
+            //console.log(getNowFormatDate(), event.item.src, '加载完成');
+        }
+
+
+        function changePercent(percentNumber){
+            $(".loading__percent").html(percentNumber+"%");
+            $(".loading__inner").css("width",11+110/100*percentNumber);
+        }
+        function loadingRate(progressNumber) {
+            var loadingPercent=Math.round(progressNumber*100);
+            changePercent(loadingPercent);
+            if(loadingPercent===100){
+                setTimeout(function(){
+                    $(".loading-wrap").css("display","none");
+
+                    // 主页面开始
+                    showMain();
+                },200);
+            }
+        }
+
+        // 变化loading进度
+        function handlerProgress(event){
+            loadingRate(event.progress);
+        }
+
+
+        //指定当前队列ID
+        var currentQueueId = 0;
+
+        for (var i = 0; i < manifestList.length; i++) {
+            var queue = new createjs.LoadQueue(false, basePath);
+            queue.on("fileload", handleFileLoad, this);
+            queue.on("complete", handleQueueComplete, this);
+            queue.on("error", handleError, this);
+            queue.on("fileerror", handleFileError, this);
+
+            // 查看载入进度
+            if(i===0){
+                queue.on("progress",handlerProgress,this);
+            }
+
+            queueList.push(queue);
+        }
+        loadQueue(currentQueueId);
+    });
+</script>
+</body>
+</html>

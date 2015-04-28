@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content=" initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://3glogo.gtimg.com/tmt/proj-shaketv-risingstar/dist/css/style-shake-mock.css?t=20141105" />
+    <script src="http://o2o.gtimg.com/shaketv/js/zepto.min.js"></script>
+    <style>
+        @-webkit-keyframes shakeUp{
+            0%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+            40%{
+                transform:translate3d(0,-80px,0);
+                -webkit-transform:translate3d(0,-80px,0);
+            }
+            60%{
+                transform:translate3d(0,-80px,0);
+                -webkit-transform:translate3d(0,-80px,0);
+            }
+            100%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+        }
+        @-webkit-keyframes shakeDown{
+            0%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+            40%{
+                transform:translate3d(0,80px,0);
+                -webkit-transform:translate3d(0,80px,0);
+            }
+            60%{
+                transform:translate3d(0,80px,0);
+                -webkit-transform:translate3d(0,80px,0);
+            }
+            100%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+        }
+        @keyframes shakeUp{
+            0%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+            40%{
+                transform:translate3d(0,-80px,0);
+                -webkit-transform:translate3d(0,-80px,0);
+            }
+            60%{
+                transform:translate3d(0,-80px,0);
+                -webkit-transform:translate3d(0,-80px,0);
+            }
+            100%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+        }
+        @keyframes shakeDown{
+            0%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+            40%{
+                transform:translate3d(0,80px,0);
+                -webkit-transform:translate3d(0,80px,0);
+            }
+            60%{
+                transform:translate3d(0,80px,0);
+                -webkit-transform:translate3d(0,80px,0);
+            }
+            100%{
+                transform:translate3d(0,0,0);
+                -webkit-transform:translate3d(0,0,0);
+            }
+        }
+        .mod-mock__front_shake .mod-mock__shake-top{
+            animation: shakeUp 1s linear;
+            -webkit-animation: shakeUp 1s linear;
+        }
+        .mod-mock__front_shake .mod-mock__shake-bottom{
+            animation: shakeDown 1s linear;
+            -webkit-animation: shakeDown 1s linear;
+        }
+    </style>
+</head>
+<body>
+<div class="mod-mock" id="d_imitate_view">
+    <div class="mod-mock__background">
+        <i class="icon mod-mock__icon-flower" ></i>
+    </div>
+    <div class="mod-mock__front">
+        <div class="mod-mock__shake-top" style="">
+            <i class="icon mod-mock__icon-shake-top"></i>
+            <div class="mod-mock__shake-top-bar d_line" style="display: none;"></div>
+        </div>
+        <div class="mod-mock__shake-bottom" style="bottom: 0;">
+            <i class="icon mod-mock__icon-shake-bottom"></i>
+            <div class="mod-mock__shake-bottom-bar d_line" style="display: none;"></div>
+        </div>
+        <div class="mod-mock__search" style="display: none;">
+            <i class="icon mod-mock__icon-loading"></i>
+            <div class="mod-mock__search-txt"></div>
+        </div>
+    </div>
+    <div class="mod-mock__select ui-clearfix">
+        <a href="javascript:;" class="mod-mock__select-wrap mod-mock__select-wrap_selected" id="a_icon_0" type="people">
+            <i href="javascript:;" class="icon mod-mock__icon-person"></i>
+        </a>
+        <a href="javascript:;" class="mod-mock__select-wrap" id="a_icon_1" type="music">
+            <i href="javascript:;" class="icon mod-mock__icon-song"></i>
+        </a>
+    </div>
+</div>
+<audio id="audio" preload = "auto" src="http://wximg.gtimg.com/tmt/_events/20150209-ibeacon-spring-h5/dist/media/5018.mp3"></audio>
+
+
+<!--↓↓↓↓↓↓↓↓↓↓↓↓这里面是你需要的↓↓↓↓↓↓↓↓↓↓↓↓-->
+<script>
+    if (window.DeviceMotionEvent) {
+        var lastUpdate = 0;//变量保存上次更新的时间
+        var x, y, z, last_x, last_y, last_z;// x、y、z记录三个轴的数据以及上一次出发的时间
+        window.addEventListener('devicemotion', function(e) {
+            var acceleration = e.accelerationIncludingGravity;// 获取含重力的加速度
+            var curTime = new Date().getTime();// 获取当前时间
+            var diffTime = curTime - lastUpdate;//时间差
+            // 固定时间段
+            if (diffTime > 100) {
+                lastUpdate = curTime;
+                x = acceleration.x;
+                y = acceleration.y;
+                z = acceleration.z;
+                var speed = Math.abs(x+y+z-last_x-last_y-last_z) / diffTime * 10000;//速度
+                //在阀值内
+                if(speed > 1000){
+                    doShake();
+                }
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+        }, false);
+    } else {
+        $(document).on('tap',function(){
+            doShake();
+        });
+    }
+</script>
+<!--↑↑↑↑↑↑↑↑↑↑↑↑这里面是你需要的↑↑↑↑↑↑↑↑↑↑↑↑-->
+
+
+
+
+<script>
+    var audio = document.querySelector("audio");
+    function doShake(){
+        $(".d_line").show();
+        $(".mod-mock__front").addClass("mod-mock__front_shake");
+        audio.play();
+        setTimeout(function(){
+            $(".d_line").hide();
+            $(".mod-mock__front").removeClass("mod-mock__front_shake");
+        },1200);
+    }
+</script>
+</body>
+</html>

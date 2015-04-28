@@ -1,0 +1,50 @@
+.fall-box{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.fall-wrap{
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	-webkit-transform-origin:center;
+	-webkit-animation-iteration-count: infinite, infinite;
+	-webkit-animation-direction: normal, normal;
+	-webkit-animation-timing-function: linear, ease-in;
+}
+.fall-item{
+	position: absolute;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-transform-origin: 50% -100%;
+}
+
+@-webkit-keyframes fade
+{
+	0%   { opacity: 1; }
+	95%  { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-webkit-keyframes drop
+{
+	0%   { -webkit-transform: translate(0px, -50px); }
+	100% { -webkit-transform: translate(0px, 800px); }
+}
+
+@-webkit-keyframes clockwiseSpin
+{
+	0%   { -webkit-transform: rotate(-50deg); }
+	100% { -webkit-transform: rotate(50deg); }
+}
+
+@-webkit-keyframes counterclockwiseSpinAndFlip
+{
+	0%   { -webkit-transform: scale(-1, 1) rotate(50deg); }
+	100% { -webkit-transform: scale(-1, 1) rotate(-50deg); }
+}
