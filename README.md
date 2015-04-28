@@ -1,5 +1,5 @@
 # WxMoment-demo
-朋友圈广告代码 Demo
+朋友圈广告代码 Demo [「点击下载」](https://github.com/TmT/WxMoment-Demo/archive/master.zip)
 
 
 ## 目录
